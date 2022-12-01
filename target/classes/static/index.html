@@ -1,0 +1,78 @@
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<title>Server-sent events demo</title>
+	</head>
+
+	<body>
+		<button>Close the connection</button>
+
+		<ul></ul>
+
+		<script>
+			var eventList = document.querySelector('ul');
+
+			// https://developer.mozilla.org/ko/docs/Web/API/EventSource
+
+			var evtSource = new EventSource('http://localhost:8080/noti/sse');
+			console.log(evtSource);
+			console.log('withCredentials', evtSource.withCredentials);
+			console.log('readyState', evtSource.readyState); // CONNECTING (0), OPEN (1), or CLOSED (2).
+			console.log('url', evtSource.url);
+
+			evtSource.onopen = function () {
+				console.log('Connection to server opened.');
+			};
+
+			evtSource.onmessage = function (e) {
+				console.log('e', e);
+				console.log('e.event', e.event);
+				console.log('e.data', e.data);
+				console.log('e.id', e.id);
+				console.log('e.retry', e.retry);
+				var newElement = document.createElement('li');
+				newElement.textContent = 'message: ' + e.data;
+				eventList.appendChild(newElement);
+			};
+
+			evtSource.onerror = function () {
+				console.log('EventSource failed.');
+			};
+
+			var button = document.querySelector('button');
+			button.onclick = function () {
+				console.log('Connection closed');
+				evtSource.close();
+			};
+
+      evtSource.addEventListener(
+				'Notify',
+				function (e) {
+          console.log('Notify', e);
+          console.log('type', e.type);
+          console.log('lastEventId', e.lastEventId);
+          console.log('timeStamp', e.timeStamp);
+          console.log('data', JSON.parse(e.data));
+          
+          var obj = JSON.parse(e.data);
+					var newElement = document.createElement('li');
+					newElement.innerHTML = `Notify: [${obj.message}] at ` + new Date(obj.date);
+					eventList.appendChild(newElement);
+				},
+				false
+			);
+
+			evtSource.addEventListener(
+				'ping',
+				function (e) {
+					var newElement = document.createElement('li');
+
+					var obj = JSON.parse(e.data);
+					newElement.innerHTML = 'ping at ' + obj.time;
+					eventList.appendChild(newElement);
+				},
+				false
+			);
+		</script>
+	</body>
+</html>

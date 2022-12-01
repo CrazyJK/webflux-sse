@@ -9,12 +9,11 @@ import lombok.Data;
 public class Notification {
 
   @Builder.Default final Date date = new Date();
+  final int id;
   final long when;
   final String type;
   final String from;
   final String to;
   final String message;
-
-  final int number;
 
 }

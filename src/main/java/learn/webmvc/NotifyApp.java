@@ -1,6 +1,8 @@
 package learn.webmvc;
 
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.actuate.web.exchanges.HttpExchangeRepository;
+import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
@@ -12,8 +14,8 @@ public class NotifyApp {
   }
 
   @Bean
-  HttpTraceRepository httpTraceRepository() {
-    return new InMemoryHttpTraceRepository();
+  HttpExchangeRepository httpTraceRepository() {
+    return new InMemoryHttpExchangeRepository();
   }
 
 }
