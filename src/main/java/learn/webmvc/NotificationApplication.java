@@ -7,10 +7,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
-public class NotifyApp {
+public class NotificationApplication {
 
   public static void main(String[] args) {
-    SpringApplication.run(NotifyApp.class, args);
+    SpringApplication.run(NotificationApplication.class, args);
   }
 
   @Bean
