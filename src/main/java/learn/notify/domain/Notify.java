@@ -1,4 +1,4 @@
-package learn.webmvc;
+package learn.notify.domain;
 
 import java.util.Date;
 

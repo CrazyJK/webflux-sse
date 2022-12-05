@@ -1,7 +1,6 @@
-package learn.webmvc;
+package learn.notify.webmvc;
 
 import java.time.Duration;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -11,6 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import learn.notify.domain.Notify;
+import learn.notify.domain.NotifyChannel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
@@ -24,15 +25,33 @@ public class NotifyController {
 
   private final NotifyChannel notifyChannel;
 
-  private AtomicInteger eventId = new AtomicInteger(0);
+  @PostMapping("/noti")
+  public Mono<Notify> receive(@RequestBody Notify notify) {
+    return Mono.just(notify)
+        .doOnNext(n -> {
+          log.debug(">> receive: {}", n);
 
-  
+          final String id = notify.getTo();
+          if (id == null || id.trim().length() == 0) {
+            throw new RuntimeException("to is blank");
+          }
+          notify.setId(notifyChannel.seqNext());
+
+          final Many<Notify> sink = notifyChannel.findSink(id);
+          if (sink == null) {
+            log.warn("id [{}] is not connected", id);
+          } else {
+            sink.tryEmitNext(n);
+          }
+        });
+  }
+
   @CrossOrigin("*")
   @GetMapping("/noti/sse/{id}")
-  public Flux<ServerSentEvent<Notify>> noti(@PathVariable String id) {
+  public Flux<ServerSentEvent<Notify>> sse(@PathVariable String id) {
     final Many<Notify> sink = notifyChannel.getSink(id);
 
-    log.debug("accept {} currentSubscriberCount {}", id, sink.currentSubscriberCount());
+    log.debug(">> accept {} currentSubscriberCount {}", id, sink.currentSubscriberCount());
 
     return sink.asFlux()
         .map(n -> ServerSentEvent.builder(n)
@@ -45,24 +64,4 @@ public class NotifyController {
         });
   }
 
-  @PostMapping("/noti")
-  public Mono<Notify> receive(@RequestBody Notify notify) {
-    log.debug("received {}", notify);
-    
-    final String id = notify.getTo();
-    if (id == null || id.trim().length() == 0) {
-      throw new RuntimeException("to is blank");
-    }
-    
-    notify.setId(eventId.incrementAndGet());
-    
-    final Many<Notify> sink = notifyChannel.findSink(id);
-    if (sink == null) {
-      log.warn("id {} is not connected", id);
-      return Mono.just(notify);
-    }
-    
-    return Mono.just(notify).doOnNext(n -> sink.tryEmitNext(n));
-  }
-  
 }
