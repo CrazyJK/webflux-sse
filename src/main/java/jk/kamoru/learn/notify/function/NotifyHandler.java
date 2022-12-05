@@ -1,7 +1,6 @@
-package learn.notify.function;
+package jk.kamoru.learn.notify.function;
 
 import java.time.Duration;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
@@ -9,9 +8,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-
-import learn.notify.domain.Notify;
-import learn.notify.domain.NotifyChannel;
+import jk.kamoru.learn.notify.domain.Notify;
+import jk.kamoru.learn.notify.domain.NotifyChannel;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks.Many;
@@ -20,8 +18,7 @@ import reactor.core.publisher.Sinks.Many;
 @Component
 public class NotifyHandler {
 
-  @Autowired
-  private NotifyChannel notifyChannel;
+  @Autowired private NotifyChannel notifyChannel;
 
   public Mono<ServerResponse> receive(ServerRequest request) {
     return request.bodyToMono(Notify.class)

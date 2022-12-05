@@ -1,7 +1,6 @@
-package learn.notify.webmvc;
+package jk.kamoru.learn.notify.webmvc;
 
 import java.time.Duration;
-
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,9 +8,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import learn.notify.domain.Notify;
-import learn.notify.domain.NotifyChannel;
+import jk.kamoru.learn.notify.domain.Notify;
+import jk.kamoru.learn.notify.domain.NotifyChannel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
